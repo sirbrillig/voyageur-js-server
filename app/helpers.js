@@ -5,7 +5,7 @@ import logStream from 'bunyan-mongodb-stream';
 import bunyan from 'bunyan';
 import Log from './models/log';
 
-//dotenv.load();
+dotenv.load();
 
 distance.apiKey = process.env.GOOGLE_DISTANCE_API_KEY;
 
