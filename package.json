@@ -13,7 +13,7 @@
   "scripts": {
     "start": "node build/server.js",
     "test": "make test",
-    "postinstall": "make build"
+    "postinstall": "make build-server"
   },
   "dependencies": {
     "body-parser": "^1.14.2",
