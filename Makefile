@@ -9,8 +9,7 @@ BUILD_DIR = build
 SERVER_JS = app/server.js
 SERVER_BUNDLE_JS = $(BUILD_DIR)/server.js
 BABELIFY_PLUGIN = [ babelify --presets [ es2015 ] ]
-BROWSERIFY_EXCLUDE = "**/mongoose/**"
-BROWSERIFY_OPTIONS = --verbose -u $(BROWSERIFY_EXCLUDE) --node $(SERVER_JS) -d -t $(BABELIFY_PLUGIN) -o $(SERVER_BUNDLE_JS)
+BROWSERIFY_OPTIONS = --verbose --exclude "**/mongoose/**" --exclude "**/google-distance/**"  --node $(SERVER_JS) --debug -t $(BABELIFY_PLUGIN) -o $(SERVER_BUNDLE_JS)
 
 run: install build-server webserver watchify
 
