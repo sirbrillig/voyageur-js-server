@@ -12,7 +12,7 @@ import router from './routes';
 const app = express();
 const logger = logFactory();
 
-dotenv.load();
+//dotenv.load();
 
 mongoose.connect( process.env.MONGO_CLIENT_SERVER );
 
