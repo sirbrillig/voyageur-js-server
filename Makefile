@@ -1,7 +1,8 @@
-WATCHIFY = ./node_modules/.bin/watchify
-BROWSERIFY = ./node_modules/.bin/browserify
-NODEMON = ./node_modules/.bin/nodemon
-MOCHA = ./node_modules/.bin/mocha
+BIN_PATH = node_modules/.bin
+WATCHIFY = $(BIN_PATH)/watchify
+BROWSERIFY = $(BIN_PATH)/browserify
+NODEMON = $(BIN_PATH)/nodemon
+MOCHA = $(BIN_PATH)/mocha
 NPM = npm
 NODE ?= node
 BUILD_DIR = build
