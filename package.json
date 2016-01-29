@@ -13,7 +13,7 @@
   "scripts": {
     "start": "node build/server.js",
     "test": "make test",
-    "postinstall": "make build-server"
+    "postinstall": "browserify -u \"**/mongoose/**\" --node app/server.js -d -t [ babelify --presets [ es2015  ]  ] -o build/server.js"
   },
   "dependencies": {
     "body-parser": "^1.14.2",
