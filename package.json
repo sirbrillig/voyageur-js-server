@@ -1,9 +1,9 @@
 {
-  "name": "auth0-nodejsapi-sample",
+  "name": "voyageur-js-server",
   "version": "0.1.0",
-  "description": "Auth0 + NodeJS API Seed",
-  "repository": "git://github.com/auth0/auth0-nodejsapi-sample",
-  "author": "Auth0",
+  "description": "A REST API server for the Voyageur distance calculation app",
+  "repository": "https://github.com/sirbrillig/voyageur-js-server",
+  "author": "Payton Swick <payton@foolord.com>",
   "license": "MIT",
   "babel": {
     "presets": [
@@ -13,7 +13,7 @@
   "scripts": {
     "start": "node build/server.js",
     "test": "make test",
-    "postinstall": "browserify -u \"**/mongoose/**\" --node app/server.js -d -t [ babelify --presets [ es2015  ]  ] -o build/server.js"
+    "postinstall": "make build-server"
   },
   "dependencies": {
     "body-parser": "^1.14.2",
