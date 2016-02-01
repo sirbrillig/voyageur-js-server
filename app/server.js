@@ -4,6 +4,8 @@ import jwt from 'express-jwt';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import { Promise } from 'es6-promise';
+mongoose.Promise = Promise;
 import morgan from 'morgan';
 import { logFactory } from './helpers';
 

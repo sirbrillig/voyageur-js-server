@@ -114,6 +114,16 @@ describe( 'locations', function() {
         expect( address ).to.eql( mockLocations.homeLocation.address );
       } );
     } );
+
+    it( 'removes any associated TripLocations that are saved', function() {
+      return locations.removeLocationForUser( mockUsers.testUserId, mockLocations.homeLocation._id )
+      .then( function() {
+        return models.TripLocation.findOne( { location: mockLocations.homeLocation._id } )
+        .then( obj => {
+          expect( obj ).to.not.be.ok;
+        } );
+      } );
+    } );
   } );
 
   describe( '.getLocationForUser', function() {
