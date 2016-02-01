@@ -37,6 +37,21 @@ describe( 'tripLocations', function() {
         expect( data.map( x => x.location ) ).to.eql( mockTrips.testUserTrip.tripLocations.map( x => x.location._id ) );
       } );
     } );
+
+    it( 'removes any TripLocations that have no associated Location', function() {
+      const currentTripLocations = mockTrips.testUserTrip.tripLocations.map( x => x._id )
+      .reduce( ( prev, next ) => {
+        if ( next === mockTripLocations.homeTripLocation._id ) return prev;
+        return prev.concat( next );
+      }, [] );
+      return models.Location.findOneAndRemove( { _id: mockLocations.homeLocation._id }, {} )
+      .then( function() {
+        return tripLocations.listTripLocationsForUser( mockUsers.testUserId )
+        .then( function( data ) {
+          expect( data.map( x => x._id ) ).to.eql( currentTripLocations );
+        } );
+      } );
+    } );
   } );
 
   describe( '.addLocationToTrip', function() {
