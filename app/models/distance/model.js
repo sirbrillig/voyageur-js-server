@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { Promise } from 'es6-promise';
+mongoose.Promise = Promise;
 
 const DistanceSchema = new mongoose.Schema( {
   userId: { type: String, required: true },

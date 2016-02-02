@@ -2,6 +2,7 @@ const chai = require( 'chai' );
 const chaiAsPromised = require( 'chai-as-promised' );
 const tripLocations = require( '../app/models/trip-location' );
 import { connectToDb, disconnectFromDb, resetDb, models, mockUsers, mockTrips, mockLocations, mockTripLocations } from './bootstrap';
+import { removeLocationForUser } from '../app/models/location';
 
 chai.use( chaiAsPromised );
 const expect = chai.expect;
@@ -35,6 +36,21 @@ describe( 'tripLocations', function() {
       return tripLocations.listTripLocationsForUser( mockUsers.testUserId )
       .then( function( data ) {
         expect( data.map( x => x.location ) ).to.eql( mockTrips.testUserTrip.tripLocations.map( x => x.location._id ) );
+      } );
+    } );
+
+    it( 'does not return any TripLocations that have no associated Location', function() {
+      const currentTripLocations = mockTrips.testUserTrip.tripLocations.map( x => x._id )
+      .reduce( ( prev, next ) => {
+        if ( next === mockTripLocations.homeTripLocation._id ) return prev;
+        return prev.concat( next );
+      }, [] );
+      return removeLocationForUser( mockUsers.testUserId, mockLocations.homeLocation._id )
+      .then( function() {
+        return tripLocations.listTripLocationsForUser( mockUsers.testUserId )
+        .then( function( data ) {
+          expect( data.map( x => x._id ) ).to.eql( currentTripLocations );
+        } );
       } );
     } );
   } );

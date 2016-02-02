@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { Promise } from 'es6-promise';
+mongoose.Promise = Promise;
 import findOrCreate from 'mongoose-findorcreate';
 
 const Schema = mongoose.Schema;
