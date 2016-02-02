@@ -46,4 +46,4 @@ test:
 	@echo "Running tests..."
 	$(MOCHA) --compilers js:babel-register
 
-.PHONY: run watchify install npm node-version build-server clean test
+.PHONY: run watchify install npm node-version build-server clean test build webserver
