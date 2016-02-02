@@ -1,4 +1,5 @@
 import { Promise } from 'es6-promise';
+import TripLocation, { removeTripLocationForUser } from '../../models/trip-location';
 import Location from '../../models/location';
 import LocationCollection from '../../models/location-collection';
 import { removeElementFromArray } from '../../helpers';
@@ -64,7 +65,9 @@ function removeLocation( locationId, userId ) {
     Location.findOneAndRemove( { _id: locationId, userId }, {}, ( removeErr, location ) => {
       if ( removeErr ) return reject( removeErr );
       if ( ! location ) return reject( new Error( 'no such location found' ) );
-      resolve( location );
+      TripLocation.find( { location: locationId } )
+      .then( orphans => Promise.all( orphans.map( o => removeTripLocationForUser( userId, o._id ) ) ) )
+      .then( () => resolve( location ) );
     } );
   } );
 }
