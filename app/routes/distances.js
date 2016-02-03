@@ -10,7 +10,7 @@ export default {
     } )
     .catch( ( err ) => {
       req.error( {}, err.message );
-      res.status( 502 ).send( err );
+      res.status( 400 ).send( err.message );
     } );
   }
 }
