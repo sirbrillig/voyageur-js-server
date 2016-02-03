@@ -67,9 +67,9 @@ function removeTripLocation( tripLocationId, userId ) {
   } );
 }
 
-function reorderTripLocations( collection, tripLocationIds ) {
+function reorderTripLocations( currentLocations, tripLocationIds ) {
   const newIds = tripLocationIds.reduce( ( ordered, tripLocationId ) => {
-    if ( -1 === collection.tripLocations.indexOf( tripLocationId ) ) {
+    if ( -1 === currentLocations.indexOf( tripLocationId ) ) {
       throw new Error( `Error reordering tripLocations: new location not found: ${tripLocationId}` );
     }
     if ( -1 !== ordered.indexOf( tripLocationId ) ) {
@@ -77,23 +77,27 @@ function reorderTripLocations( collection, tripLocationIds ) {
     }
     return [ ...ordered, tripLocationId ];
   }, [] );
-  if ( newIds.length !== collection.tripLocations.length ) {
-    throw new Error( `Error reordering tripLocations: differing location length: new ${newIds.length} vs. old ${collection.tripLocations.length}` );
+  if ( newIds.length !== currentLocations.length ) {
+    throw new Error( `Error reordering tripLocations: differing location length: new ${newIds.length} vs. old ${currentLocations.length}` );
   }
   return newIds;
 }
 
 function updateTripLocationsInCollection( collection, tripLocationIds ) {
   return new Promise( ( resolve, reject ) => {
-    collection.tripLocations = reorderTripLocations( collection, tripLocationIds );
-    collection.save( ( err ) => {
-      if ( err ) return reject( err );
-      resolve( collection );
-    } );
+    getTripLocationsForTrip( collection ) // prunes orphans
+    .then( tripLocations => {
+      collection.tripLocations = reorderTripLocations( tripLocations.map( x => x._id.toString() ), tripLocationIds.map( x => x.toString() ) );
+      collection.save( ( err ) => {
+        if ( err ) return reject( err );
+        resolve( collection );
+      } );
+    } )
+    .catch( reject );
   } );
 }
 
-function getTripLocationsForUser( collection ) {
+function getTripLocationsForTrip( collection ) {
   return new Promise( ( resolve, reject ) => {
     collection.populate( 'tripLocations', ( locationsErr, populatedCollection ) => {
       if ( locationsErr ) return reject( locationsErr );
@@ -105,7 +109,7 @@ function getTripLocationsForUser( collection ) {
 export function listTripLocationsForUser( userId ) {
   return new Promise( ( resolve, reject ) => {
     findOrCreateTripForUser( userId )
-    .then( getTripLocationsForUser )
+    .then( getTripLocationsForTrip )
     .then( resolve )
     .catch( reject );
   } );
@@ -115,7 +119,7 @@ export function updateTripForUser( userId, tripLocationIds ) {
   return new Promise( ( resolve, reject ) => {
     findOrCreateTripForUser( userId )
     .then( ( collection ) => updateTripLocationsInCollection( collection, tripLocationIds ) )
-    .then( getTripLocationsForUser )
+    .then( getTripLocationsForTrip )
     .then( resolve )
     .catch( reject );
   } );

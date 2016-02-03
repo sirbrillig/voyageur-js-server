@@ -72,9 +72,9 @@ function removeLocation( locationId, userId ) {
   } );
 }
 
-function reorderLocations( collection, locationIds ) {
+function reorderLocations( currentLocations, locationIds ) {
   const newIds = locationIds.reduce( ( ordered, locationId ) => {
-    if ( -1 === collection.locations.indexOf( locationId ) ) {
+    if ( -1 === currentLocations.indexOf( locationId ) ) {
       throw new Error( `Error reordering locations: new location not found: ${locationId}` );
     }
     if ( -1 !== ordered.indexOf( locationId ) ) {
@@ -82,19 +82,21 @@ function reorderLocations( collection, locationIds ) {
     }
     return [ ...ordered, locationId ];
   }, [] );
-  if ( newIds.length !== collection.locations.length ) {
-    throw new Error( `Error reordering locations: differing location length: new ${newIds.length} vs. old ${collection.locations.length}` );
+  if ( newIds.length !== currentLocations.length ) {
+    throw new Error( `Error reordering locations: differing location length: new ${newIds.length} vs. old ${currentLocations.length}` );
   }
   return newIds;
 }
 
 function updateLocationsInCollection( collection, locationIds ) {
   return new Promise( ( resolve, reject ) => {
-    collection.locations = reorderLocations( collection, locationIds );
-    collection.save( ( err ) => {
-      if ( err ) return reject( err );
-      resolve( collection );
-    } );
+    getLocationsForCollection( collection ) // prunes orphans
+    .then( locations => {
+      collection.locations = reorderLocations( locations.map( x => x._id.toString() ), locationIds.map( x => x.toString() ) );
+      return collection.save();
+    } )
+    .then( () => resolve( collection ) )
+    .catch( reject );
   } );
 }
 
