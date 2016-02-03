@@ -90,9 +90,9 @@ describe( 'locations', function() {
 
     it( 'removes the location from the user\'s list', function() {
       return locations.removeLocationForUser( mockUsers.testUserId, mockLocations.homeLocation )
-      .then( () => locations.listLocationsForUser( mockUsers.testUserId ) )
+      .then( () => models.LocationCollection.findOne( { userId: mockUsers.testUserId } ) )
       .then( function( data ) {
-        expect( data ).to.be.empty;
+        expect( data.locations ).to.be.empty;
       } );
     } );
 

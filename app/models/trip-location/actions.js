@@ -31,8 +31,8 @@ export function removeTripLocationForUser( userId, tripLocationId ) {
   return new Promise( ( resolve, reject ) => {
     findOrCreateTripForUser( userId )
     .then( ( collection ) => {
-      collection.tripLocations = removeElementFromArray( collection.tripLocations, tripLocationId );
-      removeTripLocation( tripLocationId, userId )
+      collection.tripLocations = removeElementFromArray( collection.tripLocations, tripLocationId._id || tripLocationId );
+      removeTripLocation( tripLocationId._id || tripLocationId, userId )
       .then( ( tripLocation ) => {
         collection.save( ( saveErr ) => {
           if ( saveErr ) return reject( saveErr );

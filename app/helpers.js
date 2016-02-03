@@ -21,7 +21,7 @@ export function getUserNameFromRequest( req ) {
 
 export function removeElementFromArray( ary, element ) {
   return ary.reduce( ( collection, el ) => {
-    if ( el !== element ) collection.push( el );
+    if ( el.toString() !== element.toString() ) return collection.concat( el );
     return collection;
   }, [] );
 }

@@ -86,9 +86,9 @@ describe( 'tripLocations', function() {
   describe( '.removeAllTripLocations', function() {
     it( 'removes all the TripLocations for the user', function() {
       return tripLocations.removeAllTripLocations( mockUsers.testUserId2 )
-      .then( () => tripLocations.listTripLocationsForUser( mockUsers.testUserId2 ) )
+      .then( () => models.Trip.findOne( { userId: mockUsers.testUserId2 } ) )
       .then( ( data ) => {
-        expect( data ).to.be.empty;
+        expect( data.tripLocations ).to.be.empty;
       } );
     } );
 
@@ -129,9 +129,9 @@ describe( 'tripLocations', function() {
         return prev.concat( next );
       }, [] );
       return tripLocations.removeTripLocationForUser( mockUsers.testUserId2, mockTripLocations.teaTripLocation )
-      .then( () => tripLocations.listTripLocationsForUser( mockUsers.testUserId2 ) )
+      .then( () => models.Trip.findOne( { userId: mockUsers.testUserId2 } ) )
       .then( function( data ) {
-        expect( data.map( x => x._id ) ).to.eql( currentTripLocations );
+        expect( data.tripLocations.map( x => x._id || x ) ).to.eql( currentTripLocations );
       } );
     } );
 

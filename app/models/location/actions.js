@@ -34,8 +34,8 @@ export function removeLocationForUser( userId, locationId ) {
   return new Promise( ( resolve, reject ) => {
     findOrCreateCollectionForUser( userId )
     .then( ( collection ) => {
-      collection.locations = removeElementFromArray( collection.locations, locationId );
-      removeLocation( locationId, userId )
+      collection.locations = removeElementFromArray( collection.locations, locationId._id || locationId );
+      removeLocation( locationId._id || locationId, userId )
       .then( ( location ) => {
         collection.save( ( saveErr ) => {
           if ( saveErr ) return reject( saveErr );
