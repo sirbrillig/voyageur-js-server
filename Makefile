@@ -11,9 +11,9 @@ SERVER_BUNDLE_JS = $(BUILD_DIR)/server.js
 BABELIFY_PLUGIN = [ babelify --presets [ es2015 ] ]
 BROWSERIFY_OPTIONS = --verbose --exclude "**/mongoose/**" --exclude "**/google-distance/**"  --node $(SERVER_JS) -t $(BABELIFY_PLUGIN) -o $(SERVER_BUNDLE_JS)
 
-run: install build-server webserver watchify
+run: install webserver watchify
 
-build: install build-server
+build: install
 
 node-version: npm
 	@if [ "$(shell $(NODE) --version | sed 's/[^0-9]//g')" -lt 400 ]; then echo "Please upgrade your version of Node.js: https://nodejs.org/"; exit 1; fi
