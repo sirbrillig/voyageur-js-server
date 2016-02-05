@@ -13,7 +13,7 @@
   "scripts": {
     "start": "node build/server.js",
     "test": "make test",
-    "postinstall": "babel app -d build"
+    "postinstall": "make build-server"
   },
   "dependencies": {
     "babel-core": "^6.4.0",

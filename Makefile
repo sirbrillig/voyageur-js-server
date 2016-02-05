@@ -23,6 +23,9 @@ watch:
 	@echo "Watching app for changes..."
 	$(BABEL) --watch $(SERVER_JS_DIR) -d $(BUILD_DIR)
 
+build-server:
+	$(BABEL) $(SERVER_JS_DIR) -d $(BUILD_DIR)
+
 npm:
 	@echo "Checking for npm..."
 	@command -v npm >/dev/null 2>&1 || { echo >&2 "Please install Node.js: https://nodejs.org/"; exit 1; }
@@ -42,4 +45,4 @@ deploy:
 	@echo "Deploying to heroku..."
 	git push heroku master
 
-.PHONY: run install npm node-version clean test build webserver watch deploy
+.PHONY: run install npm node-version clean test build webserver watch deploy build-server
