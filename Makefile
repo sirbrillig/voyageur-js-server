@@ -38,4 +38,8 @@ test:
 	@echo "Running tests..."
 	$(MOCHA) --compilers js:babel-register
 
-.PHONY: run install npm node-version clean test build webserver watch
+deploy:
+	@echo "Deploying to heroku..."
+	git push heroku master
+
+.PHONY: run install npm node-version clean test build webserver watch deploy
