@@ -20,11 +20,40 @@ describe( 'log', function() {
   } );
 
   describe( '.getAllEvents', function() {
-    it( 'returns an array with all current events', function() {
+    it( 'returns an array with 100 events', function() {
+      return eventLog.getAllEvents()
+      .then( function( data ) {
+        expect( data ).to.have.length( 100 );
+      } );
+    } );
+
+    it( 'returns an array with the most recent 100 current events', function() {
       return eventLog.getAllEvents()
       .then( function( data ) {
         const actual = data.map( x => x.name );
-        const expected = Object.keys( mockEvents ).map( x => mockEvents[ x ].name );
+        const expected = Object.keys( mockEvents )
+        .sort( ( a, b ) => mockEvents[ b ].time - mockEvents[ a ].time )
+        .slice( 0, 100 )
+        .map( x => mockEvents[ x ].name );
+        expect( actual ).to.eql( expected );
+      } );
+    } );
+
+    it( 'returns an array with 100 events if a page is passed', function() {
+      return eventLog.getAllEvents( { page: 1 } )
+      .then( function( data ) {
+        expect( data ).to.have.length( 100 );
+      } );
+    } );
+
+    it( 'returns paginated data if a page is passed', function() {
+      return eventLog.getAllEvents( { page: 1 } )
+      .then( function( data ) {
+        const actual = data.map( x => x.name );
+        const expected = Object.keys( mockEvents )
+        .sort( ( a, b ) => mockEvents[ b ].time - mockEvents[ a ].time )
+        .slice( 100, 200 )
+        .map( x => mockEvents[ x ].name );
         expect( actual ).to.eql( expected );
       } );
     } );

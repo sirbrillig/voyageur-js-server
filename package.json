@@ -42,6 +42,7 @@
   "devDependencies": {
     "chai": "^3.4.1",
     "chai-as-promised": "^5.2.0",
+    "lodash.times": "^4.0.1",
     "mocha": "^2.3.4",
     "mockgoose": "^5.1.0",
     "nodemon": "^1.8.1",

@@ -1,3 +1,4 @@
+import times from 'lodash.times';
 import mongoose from 'mongoose';
 import { Promise } from 'es6-promise';
 mongoose.Promise = Promise;
@@ -69,7 +70,9 @@ function populateUser2() {
 }
 
 function populateEvents() {
-  mockEvents.firstEvent = new Log( { userId: mockUsers.testUserId2, time: Date.now(), name: 'test', event: 'get', level: 1, data: { userId: mockUsers.testUserId2 } } );
+  times( 200, i => {
+    mockEvents[ `event-${i}` ] = new Log( { userId: mockUsers.testUserId2, time: i, name: `test-event-${i}`, event: 'get', level: 1, data: { userId: mockUsers.testUserId2 } } );
+  } );
 }
 
 export function populateDb( done ) {
