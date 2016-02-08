@@ -2,7 +2,7 @@ import * as eventLog from '../models/log';
 
 export default {
   get( req, res ) {
-    const { page } = req.body;
+    const { page } = req.query;
     eventLog.getAllEvents( { page } )
     .then( ( data ) => {
       res.status( 200 ).json( data );
