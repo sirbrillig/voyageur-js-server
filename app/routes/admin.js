@@ -2,7 +2,8 @@ import * as eventLog from '../models/log';
 
 export default {
   get( req, res ) {
-    eventLog.getAllEvents()
+    const { page } = req.body;
+    eventLog.getAllEvents( { page } )
     .then( ( data ) => {
       res.status( 200 ).json( data );
     } )
