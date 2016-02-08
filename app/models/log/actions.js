@@ -1,19 +1,18 @@
 import { Promise } from 'es6-promise';
 import Log from '../../models/log';
 
-export function getAllEvents() {
-  return new Promise( ( resolve, reject ) => {
-    getAllLogs()
-    .then( resolve )
-    .catch( reject );
-  } );
+export function getAllEvents( opts ) {
+  return getAllLogs( opts );
 }
 
-function getAllLogs() {
+function getAllLogs( opts = {} ) {
+  const limitPerPage = opts.limit || 100;
+  const page = opts.page || 0;
   return new Promise( ( resolve, reject ) => {
     Log.find( {} )
     .sort( { time: -1 } )
-    .limit( 100 )
+    .skip( limitPerPage * page )
+    .limit( limitPerPage )
     .exec( ( err, logs ) => {
       if ( err ) return reject( err );
       return resolve( logs );
