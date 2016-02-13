@@ -1,0 +1,6 @@
+AUTH0_CLIENT_ID=yourauth0clientid
+AUTH0_CLIENT_SECRET=yourauth0clientsecret
+AUTH0_DOMAIN=yourauth0clientdomain
+AUTH0_CALLBACK_URL=yourauth0clientcallbackurl
+MONGO_CLIENT_SERVER=yourmongodbserver
+GOOGLE_DISTANCE_API_KEY=yourgoogledistanceapikey
