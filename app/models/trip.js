@@ -4,10 +4,11 @@ mongoose.Promise = Promise;
 import findOrCreate from 'mongoose-findorcreate';
 
 const Schema = mongoose.Schema;
+const getDefaultDate = () => new Date( ( new Date() ).valueOf() - 1000 * 60 * 60 ).getTime();
 
 const TripSchema = new Schema( {
   userId: { type: String, required: true },
-  lastUpdated: { type: Date, default: Date.now, required: true },
+  lastUpdated: { type: Date, default: getDefaultDate, required: true },
   tripLocations: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Location' } ],
 } );
 
