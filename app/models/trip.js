@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 
 const TripSchema = new Schema( {
   userId: { type: String, required: true },
-  lastUpdated: { type: Date, required: true },
+  lastUpdated: { type: Date, default: Date.now, required: true },
   tripLocations: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Location' } ],
 } );
 
