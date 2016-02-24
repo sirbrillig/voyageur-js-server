@@ -46,8 +46,9 @@ function removeTripLocation( tripLocationId, userId ) {
   } );
 }
 
-function updateTripLocationsInCollection( collection, tripLocationIds ) {
+function updateTripLocationsInCollection( collection, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
+    if ( collection.lastUpdated.getTime() > date ) return reject( new Error( 'Trip update is too old to apply' ) );
     collection.tripLocations = tripLocationIds;
     collection.save()
     .then( () => resolve( collection ) )
@@ -67,8 +68,8 @@ export function updateTripForUser( userId, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
     Promise.all( tripLocationIds.map( loc => getLocationForUser( userId, loc ) ) )
     .then( () => {
-      findOrCreateTripForUser( userId )
-      .then( trip => updateTripLocationsInCollection( trip, tripLocationIds ) )
+      return findOrCreateTripForUser( userId )
+      .then( trip => updateTripLocationsInCollection( trip, tripLocationIds, date ) )
       .then( trip => resolve( trip.tripLocations ) )
     } )
     .catch( reject );
