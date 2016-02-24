@@ -63,7 +63,7 @@ export function listTripLocationsForUser( userId ) {
   } );
 }
 
-export function updateTripForUser( userId, tripLocationIds ) {
+export function updateTripForUser( userId, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
     Promise.all( tripLocationIds.map( loc => getLocationForUser( userId, loc ) ) )
     .then( () => {

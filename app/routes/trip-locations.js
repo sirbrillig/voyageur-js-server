@@ -20,8 +20,8 @@ export default {
 
   updateList( req, res ) {
     const userId = getUserIdFromRequest( req );
-    const { tripLocationIds } = req.body;
-    updateTripForUser( userId, tripLocationIds )
+    const { tripLocationIds, date } = req.body;
+    updateTripForUser( userId, tripLocationIds, date )
     .then( ( updatedLocations ) => {
       res.status( 200 ).json( updatedLocations );
     } )

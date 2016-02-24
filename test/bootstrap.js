@@ -42,7 +42,7 @@ function populateUser1() {
   const oldDate = new Date( ( new Date() ).valueOf() - 1000 * 60 * 60 * 24 * 7 );
   mockDistances.beachHomeDistance = new Distance( { userId: mockUsers.testUserId, origin: mockLocations.beachLocation, destination: mockLocations.homeLocation, distance: 400, cachedAt: oldDate } );
 
-  mockTrips.testUserTrip = new Trip( { userId: mockUsers.testUserId, tripLocations: [ mockLocations.homeLocation._id, mockLocations.coffeeLocation._id, mockLocations.beachLocation._id ] } );
+  mockTrips.testUserTrip = new Trip( { userId: mockUsers.testUserId, lastUpdated: Date.now(), tripLocations: [ mockLocations.homeLocation._id, mockLocations.coffeeLocation._id, mockLocations.beachLocation._id ] } );
 
   mockLocationCollections.testUserLocationCollection = new LocationCollection( { userId: mockUsers.testUserId, locations: [ mockLocations.homeLocation._id ] } );
 }
@@ -54,7 +54,7 @@ function populateUser2() {
 
   mockDistances.teaFoodDistance = new Distance( { userId: mockUsers.testUserId2, origin: mockLocations.teaLocation, destination: mockLocations.foodLocation, distance: 2000 } );
 
-  mockTrips.testUserTrip2 = new Trip( { userId: mockUsers.testUserId2, tripLocations: [ mockLocations.teaLocation._id, mockLocations.foodLocation._id ] } );
+  mockTrips.testUserTrip2 = new Trip( { userId: mockUsers.testUserId2, lastUpdated: Date.now(), tripLocations: [ mockLocations.teaLocation._id, mockLocations.foodLocation._id ] } );
 
   mockLocationCollections.testUser2LocationCollection = new LocationCollection( { userId: mockUsers.testUserId2, locations: [ mockLocations.workLocation._id, mockLocations.foodLocation._id, mockLocations.teaLocation._id ] } );
 }
