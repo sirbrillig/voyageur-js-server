@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 
 const TripSchema = new Schema( {
   userId: { type: String, required: true },
-  tripLocations: [ { type: mongoose.Schema.Types.ObjectId, ref: 'TripLocation' } ],
+  tripLocations: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Location' } ],
 } );
 
 TripSchema.plugin( findOrCreate );
