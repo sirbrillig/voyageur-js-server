@@ -1,7 +1,7 @@
 const chai = require( 'chai' );
 const chaiAsPromised = require( 'chai-as-promised' );
 const tripLocations = require( '../app/models/trip-location' );
-import { connectToDb, disconnectFromDb, resetDb, models, mockUsers, mockTrips, mockLocations, mockTripLocations } from './bootstrap';
+import { connectToDb, disconnectFromDb, resetDb, models, mockUsers, mockTrips, mockLocations } from './bootstrap';
 import { removeLocationForUser } from '../app/models/location';
 
 chai.use( chaiAsPromised );
@@ -28,57 +28,25 @@ describe( 'tripLocations', function() {
     it( 'returns an array with all current TripLocations', function() {
       return tripLocations.listTripLocationsForUser( mockUsers.testUserId2 )
       .then( function( data ) {
-        expect( data.map( x => x.location ) ).to.eql( mockTrips.testUserTrip2.tripLocations.map( x => x.location._id ) );
+        expect( data ).to.eql( mockTrips.testUserTrip2.tripLocations );
       } );
     } );
 
     it( 'returns an array that does not include TripLocations from other users', function() {
       return tripLocations.listTripLocationsForUser( mockUsers.testUserId )
       .then( function( data ) {
-        expect( data.map( x => x.location ) ).to.eql( mockTrips.testUserTrip.tripLocations.map( x => x.location._id ) );
+        expect( data ).to.eql( mockTrips.testUserTrip.tripLocations );
       } );
     } );
 
     it( 'does not return any TripLocations that have no associated Location', function() {
-      const currentTripLocations = mockTrips.testUserTrip.tripLocations.map( x => x._id )
-      .reduce( ( prev, next ) => {
-        if ( next === mockTripLocations.homeTripLocation._id ) return prev;
-        return prev.concat( next );
-      }, [] );
+      const expectedTripLocations = mockTrips.testUserTrip.tripLocations.filter( loc => loc !== mockLocations.homeLocation._id );
       return removeLocationForUser( mockUsers.testUserId, mockLocations.homeLocation._id )
       .then( function() {
         return tripLocations.listTripLocationsForUser( mockUsers.testUserId )
         .then( function( data ) {
-          expect( data.map( x => x._id ) ).to.eql( currentTripLocations );
+          expect( data ).to.eql( expectedTripLocations );
         } );
-      } );
-    } );
-  } );
-
-  describe( '.addLocationToTrip', function() {
-    it( 'creates a new TripLocation with the parameters specified', function() {
-      const params = { location: mockLocations.gameLocation._id };
-      return tripLocations.addLocationToTrip( mockUsers.testUserId, params )
-      .then( function( data ) {
-        expect( data.location ).to.eql( params.location );
-      } );
-    } );
-
-    it( 'creates a new TripLocation without non-whitelisted parameters', function() {
-      const params = { foo: 'bar', location: mockLocations.gameLocation._id };
-      return tripLocations.addLocationToTrip( mockUsers.testUserId, params )
-      .then( function( data ) {
-        expect( data.foo ).to.not.exist;
-      } );
-    } );
-
-    it( 'adds the TripLocation to the end of the user\'s list', function() {
-      const params = { location: mockLocations.workLocation._id };
-      return tripLocations.addLocationToTrip( mockUsers.testUserId2, params )
-      .then( () => tripLocations.listTripLocationsForUser( mockUsers.testUserId2 ) )
-      .then( function( data ) {
-        const last = data[ data.length - 1 ];
-        expect( last.location ).to.eql( params.location );
       } );
     } );
   } );
@@ -108,101 +76,41 @@ describe( 'tripLocations', function() {
     } );
   } );
 
-  describe( '.removeTripLocationForUser', function() {
-    it( 'removes the TripLocation from the database', function() {
-      let locationCount = 0;
-      return models.TripLocation.find()
-      .then( ( initialData ) => {
-        locationCount = initialData.length;
-        return tripLocations.removeTripLocationForUser( mockUsers.testUserId2, mockTripLocations.teaTripLocation )
-      } )
-      .then( () => models.TripLocation.find() )
-      .then( function( data ) {
-        expect( data ).to.have.length( locationCount - 1 );
-      } );
-    } );
-
-    it( 'removes the TripLocation from the user\'s trip', function() {
-      const currentTripLocations = mockTrips.testUserTrip2.tripLocations.map( x => x._id )
-      .reduce( ( prev, next ) => {
-        if ( next === mockTripLocations.teaTripLocation._id ) return prev;
-        return prev.concat( next );
-      }, [] );
-      return tripLocations.removeTripLocationForUser( mockUsers.testUserId2, mockTripLocations.teaTripLocation )
-      .then( () => models.Trip.findOne( { userId: mockUsers.testUserId2 } ) )
-      .then( function( data ) {
-        expect( data.tripLocations.map( x => x._id || x ) ).to.eql( currentTripLocations );
-      } );
-    } );
-
-    it( 'does not remove the TripLocation if it exists for a different user', function( done ) {
-      return tripLocations.removeTripLocationForUser( mockUsers.testUserId, mockTripLocations.teaTripLocation._id )
-      .then( function( data ) {
-        done( `expected a rejection, but got ${data}` );
-      } )
-      .catch( function() {
-        done();
-      } );
-    } );
-
-    it( 'returns the removed TripLocation', function() {
-      return tripLocations.removeTripLocationForUser( mockUsers.testUserId2, mockTripLocations.teaTripLocation._id )
-      .then( function( tripLocation ) {
-        expect( tripLocation.location ).to.eql( mockTripLocations.teaTripLocation.location._id );
-      } );
-    } );
-  } );
-
-  describe( '.getTripLocationForUser', function() {
-    it( 'returns the TripLocation if it exists for a user', function() {
-      return tripLocations.getTripLocationForUser( mockUsers.testUserId2, mockTripLocations.teaTripLocation._id )
-      .then( function( data ) {
-        expect( data ).to.have.property( '_id' ).eql( mockTripLocations.teaTripLocation._id );
-        expect( data.location ).to.eql( mockTripLocations.teaTripLocation.location._id );
-      } );
-    } );
-
-    it( 'does not return the location if it exists for a different user', function( done ) {
-      return tripLocations.getTripLocationForUser( mockUsers.testUserId, mockTripLocations.teaTripLocation._id )
-      .catch( function() {
-        done();
-      } );
-    } );
-  } );
-
   describe( '.updateTripForUser', function() {
     it( 'returns re-ordered TripLocations', function() {
-      const ids = [ mockTripLocations.foodTripLocation._id, mockTripLocations.teaTripLocation._id ];
-      expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( ids );
+      const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id ];
+      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( ids );
     } );
 
     it( 're-orders existing TripLocations', function( done ) {
-      const ids = [ mockTripLocations.foodTripLocation._id, mockTripLocations.teaTripLocation._id ];
+      const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id ];
       tripLocations.updateTripForUser( mockUsers.testUserId2, ids )
       .then( () => tripLocations.listTripLocationsForUser( mockUsers.testUserId2 ) )
       .then( function( data ) {
-        const newIds = data.map( loc => loc._id );
+        const newIds = data;
         if ( newIds.toString() === ids.toString() ) return done();
         done( `TripLocations were not re-ordered; expected ${ids.toString()}, got ${newIds.toString()}` );
       } );
     } );
 
-    it( 'does not re-order collection if params include a duplicate TripLocation ID', function() {
-      const ids = [ mockTripLocations.foodTripLocation._id, mockTripLocations.teaTripLocation._id, mockTripLocations.teaTripLocation._id ];
-      const oldIds = [ mockTripLocations.teaTripLocation._id, mockTripLocations.foodTripLocation._id ];
-      expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( oldIds );
+    it( 're-orders collection if params include a duplicate TripLocation ID', function() {
+      const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id, mockLocations.teaLocation._id ];
+      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( ids );
     } );
 
-    it( 'does not re-order collection if params do not include all TripLocation IDs', function() {
-      const ids = [ mockTripLocations.foodTripLocation._id ];
-      const oldIds = [ mockTripLocations.teaTripLocation._id, mockTripLocations.foodTripLocation._id ];
-      expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( oldIds );
+    it( 'creates a new TripLocation if one is added', function() {
+      const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id, mockLocations.workLocation._id ];
+      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( ids );
     } );
 
-    it( 'does not re-order collection if params include a TripLocation ID for another user', function() {
-      const ids = [ mockTripLocations.foodTripLocation._id, mockTripLocations.homeTripLocation._id ];
-      const oldIds = [ mockTripLocations.teaTripLocation._id, mockTripLocations.foodTripLocation._id ];
-      expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( oldIds );
+    it( 'removes TripLocations from collection if params do not include all TripLocation IDs', function() {
+      const ids = [ mockLocations.foodLocation._id ];
+      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.eql( ids );
+    } );
+
+    it( 'does not add location to collection if params include a TripLocation ID for another user', function() {
+      const ids = [ mockLocations.foodLocation._id, mockLocations.homeLocation._id ];
+      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids ) ).to.eventually.be.rejected;
     } );
   } );
 } );
