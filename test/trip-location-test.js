@@ -122,7 +122,7 @@ describe( 'tripLocations', function() {
     it( 'does not add location to collection if param include a date which is older than the lastUpdated date', function() {
       const ids = [ mockLocations.foodLocation._id ];
       const date = new Date( ( new Date() ).valueOf() - 1000 * 60 * 60 ).getTime();
-      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.be.rejected;
+      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.eql( mockTrips.testUserTrip2.tripLocations );
     } );
   } );
 } );

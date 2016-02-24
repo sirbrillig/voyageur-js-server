@@ -48,7 +48,7 @@ function removeTripLocation( tripLocationId, userId ) {
 
 function updateTripLocationsInCollection( collection, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
-    if ( collection.lastUpdated.getTime() > date ) return reject( new Error( 'Trip update is too old to apply' ) );
+    if ( collection.lastUpdated.getTime() > date ) return resolve( collection );
     collection.tripLocations = tripLocationIds;
     collection.save()
     .then( () => resolve( collection ) )
