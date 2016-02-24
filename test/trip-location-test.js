@@ -124,5 +124,16 @@ describe( 'tripLocations', function() {
       const date = new Date( ( new Date() ).valueOf() - 1000 * 60 * 60 ).getTime();
       return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.eql( mockTrips.testUserTrip2.tripLocations );
     } );
+
+    it( 'updates the lastUpdated date of the trip when an update is successful', function() {
+      const ids = [ mockLocations.foodLocation._id ];
+      const date2 = Date.now();
+      const date = new Date( ( new Date() ).valueOf() + 1000 * 60 * 60 ).getTime();
+      return tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
+      .then( function() {
+        const ids2 = [ mockLocations.teaLocation._id ];
+        return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids2, date2 ) ).to.eventually.eql( ids );
+      } );
+    } );
   } );
 } );
