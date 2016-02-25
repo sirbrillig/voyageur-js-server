@@ -1,5 +1,5 @@
 import { Promise } from 'es6-promise';
-import TripLocation, { removeTripLocationForUser } from '../../models/trip-location';
+import { removeTripLocationForUser } from '../../models/trip-location';
 import Location from '../../models/location';
 import LocationCollection from '../../models/location-collection';
 import { removeElementFromArray } from '../../helpers';
@@ -33,14 +33,12 @@ export function updateLocationForUser( userId, locationId, params ) {
 export function removeLocationForUser( userId, locationId ) {
   return new Promise( ( resolve, reject ) => {
     findOrCreateCollectionForUser( userId )
-    .then( ( collection ) => {
+    .then( collection => {
       collection.locations = removeElementFromArray( collection.locations, locationId._id || locationId );
       removeLocation( locationId._id || locationId, userId )
-      .then( ( location ) => {
-        collection.save( ( saveErr ) => {
-          if ( saveErr ) return reject( saveErr );
-          resolve( location );
-        } );
+      .then( location => {
+        collection.save()
+        .then( () => resolve( location ) );
       } )
       .catch( reject );
     } );
@@ -65,8 +63,7 @@ function removeLocation( locationId, userId ) {
     Location.findOneAndRemove( { _id: locationId, userId }, {}, ( removeErr, location ) => {
       if ( removeErr ) return reject( removeErr );
       if ( ! location ) return reject( new Error( 'no such location found' ) );
-      TripLocation.find( { location: locationId } )
-      .then( orphans => Promise.all( orphans.map( o => removeTripLocationForUser( userId, o._id ) ) ) )
+      removeTripLocationForUser( userId, locationId )
       .then( () => resolve( location ) );
     } );
   } );

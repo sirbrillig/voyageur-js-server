@@ -1,10 +1,7 @@
 import { getUserIdFromRequest } from '../helpers';
 import {
   listTripLocationsForUser,
-  addLocationToTrip,
-  getTripLocationForUser,
   removeAllTripLocations,
-  removeTripLocationForUser,
   updateTripForUser,
 } from '../models/trip-location';
 
@@ -17,46 +14,20 @@ export default {
     } )
     .catch( ( err ) => {
       req.error( {}, err.message );
-      res.status( 502 ).send( err );
-    } );
-  },
-
-  create( req, res ) {
-    const userId = getUserIdFromRequest( req );
-    const { location } = req.body;
-    addLocationToTrip( userId, { location } )
-    .then( ( tripLocation ) => {
-      res.status( 200 ).json( tripLocation );
-    } )
-    .catch( ( err ) => {
-      req.error( {}, err.message );
-      res.status( 502 ).send( err );
-    } );
-  },
-
-  get( req, res ) {
-    const userId = getUserIdFromRequest( req );
-    const { tripLocationId } = req.params;
-    getTripLocationForUser( userId, tripLocationId )
-    .then( ( tripLocation ) => {
-      res.status( 200 ).json( tripLocation );
-    } )
-    .catch( ( err ) => {
-      req.error( {}, err.message );
-      res.status( 502 ).send( err );
+      res.status( 502 ).send( err.toString() );
     } );
   },
 
   updateList( req, res ) {
     const userId = getUserIdFromRequest( req );
-    const { tripLocationIds } = req.body;
-    updateTripForUser( userId, tripLocationIds )
+    const { tripLocationIds, date } = req.body;
+    updateTripForUser( userId, tripLocationIds, date )
     .then( ( updatedLocations ) => {
       res.status( 200 ).json( updatedLocations );
     } )
     .catch( ( err ) => {
       req.error( {}, err.message );
-      res.status( 502 ).send( err );
+      res.status( 502 ).send( err.toString() );
     } );
   },
 
@@ -68,20 +39,7 @@ export default {
     } )
     .catch( ( err ) => {
       req.error( {}, err.message );
-      res.status( 502 ).send( err );
+      res.status( 502 ).send( err.toString() );
     } );
   },
-
-  delete( req, res ) {
-    const userId = getUserIdFromRequest( req );
-    const { tripLocationId } = req.params;
-    removeTripLocationForUser( userId, tripLocationId )
-    .then( ( tripLocation ) => {
-      res.status( 200 ).json( tripLocation );
-    } )
-    .catch( ( err ) => {
-      req.error( {}, err.message );
-      res.status( 502 ).send( err );
-    } )
-  }
 };

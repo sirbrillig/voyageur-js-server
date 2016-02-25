@@ -118,9 +118,9 @@ describe( 'locations', function() {
     it( 'removes any associated TripLocations that are saved', function() {
       return locations.removeLocationForUser( mockUsers.testUserId, mockLocations.homeLocation._id )
       .then( function() {
-        return models.TripLocation.findOne( { location: mockLocations.homeLocation._id } )
+        return models.Trip.findOne( { userId: mockUsers.testUserId } )
         .then( obj => {
-          expect( obj ).to.not.be.ok;
+          expect( obj ).to.not.include( mockLocations.homeLocation._id )
         } );
       } );
     } );

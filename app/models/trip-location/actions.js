@@ -1,17 +1,7 @@
 import { Promise } from 'es6-promise';
-import TripLocation from '../../models/trip-location';
 import Trip from '../../models/trip';
 import { removeElementFromArray } from '../../helpers';
-
-export function getTripLocationForUser( userId, tripLocationId ) {
-  return new Promise( ( resolve, reject ) => {
-    TripLocation.findOne( { _id: tripLocationId, userId }, function( err, tripLocation ) {
-      if ( err ) return reject( err );
-      if ( ! tripLocation ) return reject( new Error( 'no such tripLocation found' ) );
-      resolve( tripLocation );
-    } );
-  } );
-}
+import { getLocationForUser } from '../../models/location';
 
 export function removeAllTripLocations( userId ) {
   return new Promise( ( resolve, reject ) => {
@@ -44,106 +34,53 @@ export function removeTripLocationForUser( userId, tripLocationId ) {
   } );
 }
 
-function saveNewTripLocation( tripLocation, collection ) {
-  return new Promise( ( resolve, reject ) => {
-    tripLocation.save( ( err ) => {
-      if ( err ) return reject( err );
-      collection.tripLocations.push( tripLocation._id );
-      collection.save( ( collectionErr ) => {
-        if ( collectionErr ) return reject( collectionErr );
-        resolve( tripLocation );
-      } );
-    } );
-  } );
-}
-
 function removeTripLocation( tripLocationId, userId ) {
   return new Promise( ( resolve, reject ) => {
-    TripLocation.findOneAndRemove( { _id: tripLocationId, userId }, {}, ( removeErr, tripLocation ) => {
-      if ( removeErr ) return reject( removeErr );
-      if ( ! tripLocation ) return reject( new Error( 'no such tripLocation found' ) );
-      resolve( tripLocation );
-    } );
-  } );
-}
-
-function reorderTripLocations( currentLocations, tripLocationIds ) {
-  const newIds = tripLocationIds.reduce( ( ordered, tripLocationId ) => {
-    if ( -1 === currentLocations.indexOf( tripLocationId ) ) {
-      throw new Error( `Error reordering tripLocations: new location not found: ${tripLocationId}` );
-    }
-    if ( -1 !== ordered.indexOf( tripLocationId ) ) {
-      throw new Error( `Error reordering tripLocations: duplicate location found: ${tripLocationId}` );
-    }
-    return [ ...ordered, tripLocationId ];
-  }, [] );
-  if ( newIds.length !== currentLocations.length ) {
-    throw new Error( `Error reordering tripLocations: differing location length: new ${newIds.length} vs. old ${currentLocations.length}` );
-  }
-  return newIds;
-}
-
-function updateTripLocationsInCollection( collection, tripLocationIds ) {
-  return new Promise( ( resolve, reject ) => {
-    getTripLocationsForTrip( collection ) // prunes orphans
-    .then( tripLocations => {
-      collection.tripLocations = reorderTripLocations( tripLocations.map( x => x._id.toString() ), tripLocationIds.map( x => x.toString() ) );
-      collection.save( ( err ) => {
-        if ( err ) return reject( err );
-        resolve( collection );
-      } );
+    findOrCreateTripForUser( userId )
+    .then( collection => {
+      collection.tripLocations = collection.tripLocations.filter( x => x !== tripLocationId );
+      return collection.save()
+      .then( () => resolve( collection ) );
     } )
     .catch( reject );
   } );
 }
 
-function getTripLocationsForTrip( collection ) {
+function updateTripLocationsInCollection( collection, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
-    collection.populate( 'tripLocations', ( locationsErr, populatedCollection ) => {
-      if ( locationsErr ) return reject( locationsErr );
-      resolve( populatedCollection.tripLocations );
-    } );
+    // Silently fail if the update is old, because we've probably already got the new data
+    if ( collection.lastUpdated.getTime() > date ) return resolve( collection );
+    Trip.findByIdAndUpdate( collection._id, { lastUpdated: date, tripLocations: tripLocationIds }, { new: true } )
+    .then( resolve )
+    .catch( err => reject( new Error( 'Error saving trip: ' + err.toString() ) ) );
   } );
 }
 
 export function listTripLocationsForUser( userId ) {
   return new Promise( ( resolve, reject ) => {
     findOrCreateTripForUser( userId )
-    .then( getTripLocationsForTrip )
-    .then( resolve )
+    .then( trip => resolve( trip.tripLocations ) )
     .catch( reject );
   } );
 }
 
-export function updateTripForUser( userId, tripLocationIds ) {
+export function updateTripForUser( userId, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
-    findOrCreateTripForUser( userId )
-    .then( ( collection ) => updateTripLocationsInCollection( collection, tripLocationIds ) )
-    .then( getTripLocationsForTrip )
-    .then( resolve )
+    Promise.all( tripLocationIds.map( loc => getLocationForUser( userId, loc ) ) )
+    .then( () => {
+      return findOrCreateTripForUser( userId )
+      .then( trip => updateTripLocationsInCollection( trip, tripLocationIds, date ) )
+      .then( trip => resolve( trip.tripLocations ) )
+    } )
     .catch( reject );
   } );
 }
 
 function findOrCreateTripForUser( userId ) {
   return new Promise( ( resolve, reject ) => {
-    Trip.findOrCreate( { userId }, ( err, collection ) => {
+    Trip.findOrCreate( { userId }, ( err, trip ) => {
       if ( err ) return reject( err );
-      resolve( collection );
+      resolve( trip );
     } );
   } );
 }
-
-export function addLocationToTrip( userId, params ) {
-  const { location } = params;
-  return new Promise( ( resolve, reject ) => {
-    findOrCreateTripForUser( userId )
-    .then( ( collection ) => {
-      const tripLocation = new TripLocation( { userId, location } );
-      return saveNewTripLocation( tripLocation, collection );
-    } )
-    .then( resolve )
-    .catch( reject );
-  } );
-}
-

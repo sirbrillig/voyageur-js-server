@@ -70,7 +70,7 @@ function getDistanceForTripLocations( userId, tripLocations ) {
 
 function getDistanceBetweenTripLocations( userId, originTripLocation, destinationTripLocation ) {
   return new Promise( ( resolve, reject ) => {
-    Promise.all( [ originTripLocation, destinationTripLocation ].map( tripLocation => getLocationForUser( userId, tripLocation.location ) ) )
+    Promise.all( [ originTripLocation, destinationTripLocation ].map( tripLocation => getLocationForUser( userId, tripLocation ) ) )
     .then( ( [ originLocation, destinationLocation ] ) => {
       return getDistanceBetween( userId, originLocation, destinationLocation )
     } )
