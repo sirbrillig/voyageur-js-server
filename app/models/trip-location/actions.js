@@ -50,11 +50,9 @@ function updateTripLocationsInCollection( collection, tripLocationIds, date ) {
   return new Promise( ( resolve, reject ) => {
     // Silently fail if the update is old, because we've probably already got the new data
     if ( collection.lastUpdated.getTime() > date ) return resolve( collection );
-    collection.tripLocations = tripLocationIds;
-    collection.lastUpdated = date;
-    collection.save()
+    collection.update( { lastUpdated: date, tripLocations: tripLocationIds } )
     .then( () => resolve( collection ) )
-    .catch( reject );
+    .catch( err => reject( new Error( 'Error saving trip: ' + err.toString() ) ) );
   } );
 }
 
