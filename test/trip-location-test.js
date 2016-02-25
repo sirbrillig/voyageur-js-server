@@ -80,37 +80,37 @@ describe( 'tripLocations', function() {
     it( 'returns re-ordered TripLocations', function() {
       const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id ];
       const date = Date.now();
-      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.eql( ids );
+      return tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
+      .then( newIds => expect( newIds.toString() ).to.eql( ids.toString() ) );
     } );
 
-    it( 're-orders existing TripLocations', function( done ) {
+    it( 're-orders existing TripLocations', function() {
       const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id ];
       const date = Date.now();
-      tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
+      return tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
       .then( () => tripLocations.listTripLocationsForUser( mockUsers.testUserId2 ) )
-      .then( function( data ) {
-        const newIds = data;
-        if ( newIds.toString() === ids.toString() ) return done();
-        done( `TripLocations were not re-ordered; expected ${ids.toString()}, got ${newIds.toString()}` );
-      } );
+      .then( newIds => expect( newIds.toString() ).to.eql( ids.toString() ) );
     } );
 
     it( 're-orders collection if params include a duplicate TripLocation ID', function() {
       const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id, mockLocations.teaLocation._id ];
       const date = Date.now();
-      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.eql( ids );
+      return tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
+      .then( newIds => expect( newIds.toString() ).to.eql( ids.toString() ) );
     } );
 
     it( 'creates a new TripLocation if one is added', function() {
       const ids = [ mockLocations.foodLocation._id, mockLocations.teaLocation._id, mockLocations.workLocation._id ];
       const date = Date.now();
-      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.eql( ids );
+      return tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
+      .then( newIds => expect( newIds.toString() ).to.eql( ids.toString() ) );
     } );
 
     it( 'removes TripLocations from collection if params do not include all TripLocation IDs', function() {
       const ids = [ mockLocations.foodLocation._id ];
       const date = Date.now();
-      return expect( tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date ) ).to.eventually.eql( ids );
+      return tripLocations.updateTripForUser( mockUsers.testUserId2, ids, date )
+      .then( newIds => expect( newIds.toString() ).to.eql( ids.toString() ) );
     } );
 
     it( 'does not add location to collection if params include a TripLocation ID for another user', function() {
