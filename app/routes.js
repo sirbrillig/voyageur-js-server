@@ -24,6 +24,9 @@ router.route( '/secured/trip-locations' )
 router.route( '/secured/distance' )
 .get( distances.get );
 
+router.route( '/secured/distances' )
+.post( distances.post );
+
 router.route( '/admin/events' )
 .get( admin.get );
 

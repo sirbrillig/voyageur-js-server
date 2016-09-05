@@ -8,7 +8,7 @@ chai.use( sinonChai );
 import * as helpers from '../app/helpers';
 let fetchPromise = new Promise( ( resolve ) => resolve( 200 ) );
 
-import { getDistanceBetween, getDistanceForUser } from '../app/models/distance';
+import { getDistanceBetween, getDistanceForUser, getDistanceForAddresses } from '../app/models/distance';
 import { connectToDb, disconnectFromDb, resetDb, mockUsers, mockLocations } from './bootstrap';
 
 const expect = chai.expect;
@@ -24,6 +24,54 @@ describe( 'distances', function() {
 
   beforeEach( function( done ) {
     resetDb( done );
+  } );
+
+  describe( '.getDistanceForAddresses', function() {
+    beforeEach( function( done ) {
+      helpers.fetchDistanceBetween = sinon.stub().returns( fetchPromise );
+      resetDb( done );
+    } );
+
+    it( 'returns the distance between two addresses', function() {
+      helpers.fetchDistanceBetween.withArgs(
+        mockLocations.homeLocation.address,
+        mockLocations.gameLocation.address
+      ).returns( new Promise( resolve => resolve( 300 ) ) );
+      return getDistanceForAddresses( [ mockLocations.homeLocation.address, mockLocations.gameLocation.address ] )
+        .then( function( data ) {
+          expect( data ).to.equal( 300 );
+        } );
+    } );
+
+    it( 'returns the distance between three addresses', function() {
+      helpers.fetchDistanceBetween.withArgs(
+        mockLocations.homeLocation.address,
+        mockLocations.gameLocation.address
+      ).returns( new Promise( resolve => resolve( 300 ) ) );
+      return getDistanceForAddresses( [ mockLocations.homeLocation.address, mockLocations.gameLocation.address, mockLocations.foodLocation.address ] )
+        .then( function( data ) {
+          expect( data ).to.equal( 500 );
+        } );
+    } );
+
+    it( 'returns the distance between four addresses', function() {
+      helpers.fetchDistanceBetween.withArgs(
+        mockLocations.homeLocation.address,
+        mockLocations.gameLocation.address
+      ).returns( new Promise( resolve => resolve( 300 ) ) );
+      helpers.fetchDistanceBetween.withArgs(
+        mockLocations.gameLocation.address,
+        mockLocations.foodLocation.address
+      ).returns( new Promise( resolve => resolve( 400 ) ) );
+      helpers.fetchDistanceBetween.withArgs(
+        mockLocations.foodLocation.address,
+        mockLocations.teaLocation.address,
+      ).returns( new Promise( resolve => resolve( 600 ) ) );
+      return getDistanceForAddresses( [ mockLocations.homeLocation.address, mockLocations.gameLocation.address, mockLocations.foodLocation.address, mockLocations.teaLocation.address ] )
+        .then( function( data ) {
+          expect( data ).to.equal( 1300 );
+        } );
+    } );
   } );
 
   describe( '.getDistanceBetween', function() {

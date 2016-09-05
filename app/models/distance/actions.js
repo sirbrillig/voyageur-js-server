@@ -78,3 +78,18 @@ function getDistanceBetweenTripLocations( userId, originTripLocation, destinatio
     .catch( reject );
   } );
 }
+
+export function getDistanceForAddresses( addrs ) {
+  const addrPairs = addrs.reduce( ( pairs, start, index ) => {
+    const dest = addrs[ index + 1 ];
+    return dest ? pairs.concat( { start, dest } ) : pairs;
+  }, [] );
+  const fetches = addrPairs.map( pair => fetchDistanceBetween( pair.start, pair.dest ) );
+  return new Promise( resolve => {
+    Promise.all( fetches )
+      .then( results => {
+        const total = results.reduce( ( prev, num ) => prev + num, 0 );
+        resolve( total );
+      } );
+  } );
+}
