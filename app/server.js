@@ -1,4 +1,5 @@
 import express from 'express';
+import get from 'lodash.get';
 import cors from 'cors';
 import jwt from 'express-jwt';
 import dotenv from 'dotenv';
@@ -34,6 +35,13 @@ app.use( '/admin', authenticate, ( req, res, next ) => {
 } );
 app.use( logger );
 app.use( '/', router );
+
+app.use( function( err, req, res, next ) {
+  if ( err.name === 'UnauthorizedError' && get( err, 'inner.message' ) === 'jwt expired' ) {
+    return res.status( 401 ).send( { error: 'Expired token' } );
+  }
+  next();
+} );
 
 const port = process.env.PORT || 3001;
 
