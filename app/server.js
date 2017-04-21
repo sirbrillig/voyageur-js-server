@@ -38,6 +38,7 @@ app.use( '/', router );
 
 app.use( function( err, req, res, next ) {
   if ( err.name === 'UnauthorizedError' && get( err, 'inner.message' ) === 'jwt expired' ) {
+    console.log( 'Expired token' );
     return res.status( 401 ).send( { error: 'Expired token' } );
   }
   next();
