@@ -7,7 +7,7 @@ import { removeLocationForUser } from '../app/models/location';
 chai.use( chaiAsPromised );
 const expect = chai.expect;
 
-describe( 'tripLocations', function() {
+describe.skip( 'tripLocations', function() {
   before( function( done ) {
     connectToDb( done );
   } );
