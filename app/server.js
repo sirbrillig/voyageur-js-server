@@ -17,9 +17,7 @@ const logger = logFactory();
 
 dotenv.load();
 
-mongoose.connect( process.env.MONGO_CLIENT_SERVER, {
-  useMongoClient: true,
-} );
+mongoose.connect( process.env.MONGO_CLIENT_SERVER);
 
 const authenticate = jwt( {
   secret: new Buffer( process.env.AUTH0_CLIENT_SECRET, 'base64' ),
