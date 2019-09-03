@@ -1,17 +1,21 @@
 module.exports = {
-	root: true,
-	'extends': 'wpcalypso/react',
-	parser: 'babel-eslint',
-	env: {
-		browser: true,
+  env: {
+    browser: true,
+    es6: true,
 		mocha: true,
 		node: true
-	},
-	rules: {
-		'wpcalypso/jsx-classname-namespace': 0,
-		'max-len': 0,
-		'camelcase': 0,
-		'indent': [ 'error', 2 ],
-		'curly': 0,
-	}
+  },
+  extends: ['eslint:recommended'],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+  },
+  parserOptions: {
+    sourceType: 'module',
+    ecmaFeatures: {},
+    ecmaVersion: 2018,
+  },
+  plugins: [],
+  rules: {},
+  settings: {},
 };

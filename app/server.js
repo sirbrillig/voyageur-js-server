@@ -1,3 +1,4 @@
+/* @format */
 import express from 'express';
 import get from 'lodash.get';
 import cors from 'cors';
@@ -17,37 +18,40 @@ const logger = logFactory();
 
 dotenv.load();
 
-mongoose.connect( process.env.MONGO_CLIENT_SERVER);
+mongoose.connect(process.env.MONGO_CLIENT_SERVER);
 
-const authenticate = jwt( {
-  secret: new Buffer( process.env.AUTH0_CLIENT_SECRET, 'base64' ),
-  audience: process.env.AUTH0_CLIENT_ID
-} );
+const authenticate = jwt({
+  secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
+  audience: process.env.AUTH0_CLIENT_ID,
+});
 
-app.use( cors() );
-app.use( morgan( 'dev' ) );
-app.use( bodyParser.urlencoded( { extended: true } ) );
-app.use( bodyParser.json() );
-app.use( '/secured', authenticate );
-app.use( '/admin', authenticate, ( req, res, next ) => {
-  if ( req.user.role !== 'admin' ) return res.sendStatus( 401 );
+app.use(cors());
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use('/secured', authenticate);
+app.use('/admin', authenticate, (req, res, next) => {
+  if (req.user.role !== 'admin') return res.sendStatus(401);
   next();
-} );
-app.use( logger );
-app.use( '/', router );
+});
+app.use(logger);
+app.use('/', router);
 
-app.use( function( err, req, res, next ) {
-  if ( err.name === 'UnauthorizedError' && get( err, 'inner.message' ) === 'jwt expired' ) {
-    console.log( 'Expired token' );
-    return res.status( 401 ).send( { error: 'Expired token' } );
-  } else if ( err ) {
-    console.log( 'Unknown error', err );
+app.use(function(err, req, res, next) {
+  if (
+    err.name === 'UnauthorizedError' &&
+    get(err, 'inner.message') === 'jwt expired'
+  ) {
+    console.log('Expired token');
+    return res.status(401).send({ error: 'Expired token' });
+  } else if (err) {
+    console.log('Unknown error', err);
   }
   next();
-} );
+});
 
 const port = process.env.PORT || 3001;
 
-app.listen( port, () => {
-  console.log( 'listening in http://localhost:' + port );
-} );
+app.listen(port, () => {
+  console.log('listening in http://localhost:' + port);
+});

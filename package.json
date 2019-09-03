@@ -43,10 +43,13 @@
   "devDependencies": {
     "chai": "^3.4.1",
     "chai-as-promised": "^5.2.0",
+    "eslint": "^6.3.0",
+    "eslint-plugin-react-hooks": "^2.0.1",
     "lodash.times": "^4.0.1",
-    "mocha": "^2.3.4",
+    "mocha": "^6.2.0",
     "mockgoose": "^5.4.1",
     "nodemon": "^1.18.10",
+    "prettier": "^1.18.2",
     "sinon": "^1.17.2",
     "sinon-chai": "^2.14.0",
     "sinon-promise": "^0.1.3"
