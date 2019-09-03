@@ -3,6 +3,7 @@ import express from 'express';
 import get from 'lodash.get';
 import cors from 'cors';
 import jwt from 'express-jwt';
+import jwks from 'jwks-rsa';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
@@ -21,8 +22,14 @@ dotenv.load();
 mongoose.connect(process.env.MONGO_CLIENT_SERVER);
 
 const authenticate = jwt({
-  secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
-  audience: process.env.AUTH0_CLIENT_ID,
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: 'https://foolord.auth0.com/.well-known/jwks.json',
+  }),
+  audience: 'https://voyageur-js.herokuapp.com/',
+  issuer: 'https://foolord.auth0.com/',
 });
 
 app.use(cors());
