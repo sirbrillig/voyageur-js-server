@@ -6,6 +6,11 @@ import admin from './routes/admin';
 
 const router = express.Router();
 
+router.route( '/ping' )
+.get( ( req, res ) => {
+  res.status( 200 ).json( { ping: 'pong' } );
+} );
+
 router.route( '/secured/locations' )
 .get( locations.list )
 .post( locations.create )
